@@ -1,0 +1,34 @@
+{
+  "name": "lysis-angular-form-validators-generator",
+  "version": "0.0.4",
+  "description": "Generate Angular form validators for JSON LD backend",
+  "main": "index.js",
+  "contributors": [
+    "David Duquenoy"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/momenttech/lysis-angular-form-validators-generator"
+  },
+  "bugs": {
+    "url": "https://github.com/momenttech/lysis-angular-form-validators-generator/issues"
+  },
+  "homepage": "https://momenttech.github.io/lysis-angular-form-validators-generator",
+  "keywords": [
+    "lysis",
+    "jsonld",
+    "rest",
+    "api",
+    "generator",
+    "typescript",
+    "form",
+    "validator",
+    "angular"
+  ],
+  "devDependencies": {
+    "api-lysis": "^0.0.5"
+  },
+  "dependencies": {},
+  "scripts": {}
+}
