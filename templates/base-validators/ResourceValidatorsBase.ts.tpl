@@ -7,6 +7,6 @@ import { FormGroupValidators } from '../tools/FormGroupValidators';
 
 export class {{ ucc resource.title }}ValidatorsBase extends FormGroupValidators {
   {{#each resource.fields}}
-    {{ name }}: {{ validators this }};
+    {{ name }} = {{ validators this }};
   {{/each}}
 }

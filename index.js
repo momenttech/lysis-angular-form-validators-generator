@@ -42,7 +42,9 @@ var tsValidatorsGenerator = function(parameters) {
   }
 
   lysisUtils.createFile('validation-matcher-base', `${basePath}/FormGroupValidationMatcherBase.ts`, parameters.context);
-  lysisUtils.createFile('validation-matcher', `${basePath}/FormGroupValidationMatcher.ts`, parameters.context);
+  if (!lysisUtils.exists(`${basePath}/FormGroupValidationMatcher.ts`)) {
+    lysisUtils.createFile('validation-matcher', `${basePath}/FormGroupValidationMatcher.ts`, parameters.context);
+  }
 
   lysisUtils.createFile('form-service', `${basePath}/tools/Form.service.ts`, parameters.context);
   lysisUtils.createFile('form-class', `${basePath}/tools/Form.ts`, parameters.context);

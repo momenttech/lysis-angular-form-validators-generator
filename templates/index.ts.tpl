@@ -7,8 +7,6 @@ import { FormGroupValidationMatcherBase } from './FormGroupValidationMatcherBase
 import { {{ ucc title }}Validators } from './{{ ucc title }}Validators';
 {{/each}}
 
-import { CustomerValidators } from './CustomerValidators';
-
 export {
   FormService,
   Form,
