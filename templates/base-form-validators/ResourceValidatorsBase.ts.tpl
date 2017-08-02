@@ -3,6 +3,7 @@
 
 import { Validators } from '@angular/forms';
 import { CustomValidators } from 'ng2-validation';
+import { AppValidators } from '../app-validators';
 import { FormGroupValidators } from '../tools/FormGroupValidators';
 
 export class {{ ucc resource.title }}ValidatorsBase extends FormGroupValidators {

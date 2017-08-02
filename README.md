@@ -192,6 +192,16 @@ export class BookValidators extends BookValidatorsBase {
 
 Here, only `author` validators are changed. Other validators are kept unchanged.
 
+### Add your own property validators (aka app validators)
+
+If you need to create your own validators, such as `postalCode` or `isbn` validators, add new files in `app-validators` and register it in `app-validators/index.ts`.
+
+To use it, import `AppValidators`, for example in property validators files:
+
+```
+import { AppValidators } from '../backend/forms';
+```
+
 ### Item type/validator matcher
 
 Todo

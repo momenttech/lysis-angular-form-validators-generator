@@ -6,7 +6,7 @@ var tsValidatorsGenerator = function(parameters) {
   var templatePath = path.join(__dirname, 'templates');
 
   // templates
-  lysisUtils.registerTemplate('resource-validator-base', path.join(templatePath, 'base-validators/ResourceValidatorsBase.ts.tpl'));
+  lysisUtils.registerTemplate('resource-validator-base', path.join(templatePath, 'base-form-validators/ResourceValidatorsBase.ts.tpl'));
   lysisUtils.registerTemplate('resource-validator', path.join(templatePath, 'ResourceValidators.ts.tpl'));
   lysisUtils.registerTemplate('validation-matcher-base', path.join(templatePath, 'FormGroupValidationMatcherBase.ts.tpl'));
   lysisUtils.registerTemplate('validation-matcher', path.join(templatePath, 'FormGroupValidationMatcher.ts.tpl'));
@@ -16,11 +16,16 @@ var tsValidatorsGenerator = function(parameters) {
   lysisUtils.registerTemplate('form-group-validators', path.join(templatePath, 'tools/FormGroupValidators.ts.tpl'));
   lysisUtils.registerTemplate('validation-types', path.join(templatePath, 'tools/ValidationTypes.ts.tpl'));
 
+  lysisUtils.registerTemplate('validator-boolean', path.join(templatePath, 'app-validators/Boolean.validator.ts.tpl'));
+  lysisUtils.registerTemplate('validator-item', path.join(templatePath, 'app-validators/Item.validator.ts.tpl'));
+  lysisUtils.registerTemplate('validator-index', path.join(templatePath, 'app-validators/index.ts.tpl'));
+
   lysisUtils.registerTemplate('index', path.join(templatePath, 'index.ts.tpl'));
 
   var basePath = path.join(parameters.config.basePath, (parameters.generatorConfig.dir ? parameters.generatorConfig.dir : 'form-validators'));
 
-  lysisUtils.createDir(path.join(basePath, 'base-validators'));
+  lysisUtils.createDir(path.join(basePath, 'app-validators'));
+  lysisUtils.createDir(path.join(basePath, 'base-form-validators'));
   lysisUtils.createDir(path.join(basePath, 'tools'));
 
   if (!parameters.generatorConfig.classPath) {
@@ -34,7 +39,7 @@ var tsValidatorsGenerator = function(parameters) {
     var context = { resource: resource };
     var className = lysisUtils.toCamelCase(resource.title, 'upper');
 
-    lysisUtils.createFile('resource-validator-base', `${basePath}/base-validators/${className}ValidatorsBase.ts`, context);
+    lysisUtils.createFile('resource-validator-base', `${basePath}/base-form-validators/${className}ValidatorsBase.ts`, context);
     // if extended-class target files exists, do not overwrite (except when required from config)
     if (!lysisUtils.exists(`${basePath}/${className}Validators.ts`)) {
       lysisUtils.createFile('resource-validator', `${basePath}/${className}Validators.ts`, context);
@@ -51,6 +56,12 @@ var tsValidatorsGenerator = function(parameters) {
   lysisUtils.createFile('form-group-validators', `${basePath}/tools/FormGroupValidators.ts`, parameters.context);
   lysisUtils.createFile('validation-types', `${basePath}/tools/ValidationTypes.ts`, parameters.context);
 
+  lysisUtils.createFile('validator-boolean', `${basePath}/app-validators/Boolean.validator.ts`, parameters.context);
+  lysisUtils.createFile('validator-item', `${basePath}/app-validators/Item.validator.ts`, parameters.context);
+  if (!lysisUtils.exists(`${basePath}/app-validators/index.ts`)) {
+    lysisUtils.createFile('validator-index', `${basePath}/app-validators/index.ts`, parameters.context);
+  }
+
   // create index file
   lysisUtils.createFile('index', `${basePath}/index.ts`, parameters.context);
 };
@@ -61,14 +72,18 @@ handlebars.registerHelper('validators', function(property) {
   if (property.required) {
     validators.push('Validators.required');
   }
-  switch (property.type.type) {
-    // case 'boolean': ?
-    case 'date':
-    case 'dateTime':
-    // case 'time': ?
-    validators.push('CustomValidators.date'); break;
-    case 'integer': validators.push('CustomValidators.digits'); break;
-    case 'decimal': validators.push('CustomValidators.number'); break;
+  if (property.type.scalar) {
+    switch (property.type.type) {
+      case 'boolean': validators.push('AppValidators.boolean'); break;
+      case 'date':
+      case 'dateTime':
+      // case 'time': ?
+      validators.push('CustomValidators.date'); break;
+      case 'integer': validators.push('CustomValidators.digits'); break;
+      case 'decimal': validators.push('CustomValidators.number'); break;
+    }
+  } else {
+    validators.push('AppValidators.item');
   }
 
   if (validators.length) {

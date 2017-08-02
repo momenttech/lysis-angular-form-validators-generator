@@ -1,6 +1,7 @@
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { CustomValidators } from 'ng2-validation';
 
+import { AppValidators } from '../app-validators';
 import { FormGroupValidators } from './FormGroupValidators';
 import { ValidationTypes } from './ValidationTypes';
 import { FormGroupValidationMatcher } from '../FormGroupValidationMatcher';
@@ -10,10 +11,11 @@ export class Form<T> {
   protected formGroup: FormGroup;
   protected types: ValidationTypes;
   protected validationMatcher: FormGroupValidationMatcherBase;
+  protected sourceItem: T;
 
   constructor(
     private formBuilder: FormBuilder,
-    item?: Object,
+    item?: T,
     validationTypes?: ValidationTypes,
     validationMatcher?: FormGroupValidationMatcherBase
   ) {
@@ -27,22 +29,31 @@ export class Form<T> {
 
   get group(): FormGroup { return this.formGroup; }
 
-  set(item: Object, validationTypes?: ValidationTypes): void {
+  set(item: T, validationTypes?: ValidationTypes): void {
     if (validationTypes) {
       this.types = validationTypes;
     } else {
       this.types = this.validationMatcher.get(item.constructor.name);
     }
+    this.sourceItem = item;
     this.formGroup = this.formBuilder.group(this.setFormGroupValues(item, new this.types.validator()));
   }
 
   get(): T {
     var emptyObject = new this.types.itemClass();
     var validator = new this.types.validator();
-    var result = Object.assign(emptyObject, this.formGroup.value);
+    var result = Object.assign(emptyObject, this.sourceItem, this.formGroup.value);
     for (let property in result) {
-      if (Array.isArray(validator[property]) && validator[property].indexOf(CustomValidators.date) !== -1) {
-        if (!result[property]) result[property] = null;
+      if (Array.isArray(validator[property])) {
+        if (
+          (validator[property].indexOf(CustomValidators.date) !== -1) ||
+          (validator[property].indexOf(AppValidators.item) !== -1)
+        ) {
+          if (!result[property]) result[property] = null;
+        }
+        if (validator[property].indexOf(AppValidators.boolean) !== -1) {
+          if (result[property] === "") result[property] = null;
+        }
       }
     }
     return result;
@@ -57,11 +68,26 @@ export class Form<T> {
     }
   }
 
-  protected setFormGroupValues(item: Object, group: FormGroupValidators): any {
+  debugErrors() {
+    if (this.formGroup.valid) {
+      console.log('The form is valid');
+      return;
+    }
+    for (let controlName in this.formGroup.controls) {
+      let control = this.formGroup.controls[controlName];
+      if (control.invalid && !control.touched) {
+        console.log(controlName + ': valid = ' + control.valid + ', touched = ' + control.touched);
+      }
+    }
+  }
+
+  protected setFormGroupValues(item: T, group: FormGroupValidators): any {
     var groupForBuilder = {};
     for (let property in group) {
+      // sometimes, constructors are kept
+      if ((group[property] instanceof Function)) break;
       let value: string = '';
-      if (item[property]) {
+      if (item[property] !== undefined) {
         if (item[property] instanceof Date) {
           value = this.formatDate(item[property]);
         } else {
