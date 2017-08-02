@@ -46,12 +46,12 @@ export class Form<T> {
     for (let property in result) {
       if (Array.isArray(validator[property])) {
         if (
-          (validator[property].indexOf(CustomValidators.date) !== -1) ||
-          (validator[property].indexOf(AppValidators.item) !== -1)
+          (this.hasValidator(validator[property], CustomValidators.date)) ||
+          (this.hasValidator(validator[property], AppValidators.item))
         ) {
           if (!result[property]) result[property] = null;
         }
-        if (validator[property].indexOf(AppValidators.boolean) !== -1) {
+        if (this.hasValidator(validator[property], AppValidators.boolean)) {
           if (result[property] === "") result[property] = null;
         }
       }
@@ -88,7 +88,7 @@ export class Form<T> {
       if ((group[property] instanceof Function)) break;
       let value: string = '';
       if (item[property] !== undefined) {
-        if (item[property] instanceof Date) {
+        if (this.hasValidator(group[property], CustomValidators.date)) {
           value = this.formatDate(item[property]);
         } else {
           value = item[property];
@@ -107,5 +107,10 @@ export class Form<T> {
 
   protected formatDate(date: Date): string {
     return (date ? date.toString().split('T')[0] : '');
+  }
+
+  protected hasValidator(validatorGroup: Array<any> | any, validator: any): boolean {
+    if (!(validatorGroup instanceof Array)) validatorGroup = [validatorGroup];
+    return (validatorGroup.indexOf(validator) !== -1);
   }
 }
