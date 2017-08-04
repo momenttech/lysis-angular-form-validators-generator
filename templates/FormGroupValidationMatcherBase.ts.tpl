@@ -19,11 +19,10 @@ export class FormGroupValidationMatcherBase {
   setItems() {}
 
   setBaseItems() {
-    this.items = {
+    this.items = {};
 {{#each resources}}
-      '{{ ucc title }}': {itemClass: {{ ucc title }}, validator: {{ ucc title }}Validators},
+    this.items[{{ ucc title }}.name] = {itemClass: {{ ucc title }}, validator: {{ ucc title }}Validators};
 {{/each}}
-    };
   }
 
   get(itemType: string): ValidationTypes {
