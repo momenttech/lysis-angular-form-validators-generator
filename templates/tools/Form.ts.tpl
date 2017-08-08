@@ -33,7 +33,7 @@ export class Form<T> {
     if (validationTypes) {
       this.types = validationTypes;
     } else {
-      this.types = this.validationMatcher.get(item.constructor.name);
+      this.types = this.validationMatcher.get(item['_resource']);
     }
     this.sourceItem = item;
     this.formGroup = this.formBuilder.group(this.setFormGroupValues(item, new this.types.validator()));

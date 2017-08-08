@@ -21,7 +21,7 @@ export class FormGroupValidationMatcherBase {
   setBaseItems() {
     this.items = {};
 {{#each resources}}
-    this.items[{{ ucc title }}.name] = {itemClass: {{ ucc title }}, validator: {{ ucc title }}Validators};
+    this.items[{{ ucc title }}._resource] = {itemClass: {{ ucc title }}, validator: {{ ucc title }}Validators};
 {{/each}}
   }
 
