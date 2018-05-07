@@ -1,6 +1,6 @@
 {
   "name": "lysis-angular-form-validators-generator",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Generate Angular form validators for JSON LD backend",
   "main": "index.js",
   "contributors": [
