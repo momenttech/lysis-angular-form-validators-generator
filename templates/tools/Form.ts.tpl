@@ -39,21 +39,35 @@ export class Form<T> {
     this.formGroup = this.formBuilder.group(this.setFormGroupValues(item, new this.types.validator()));
   }
 
+  protected getValue(value: any, validator: any): any {
+    if (
+      (this.hasValidator(validator, CustomValidators.date)) ||
+      (this.hasValidator(validator, AppValidators.item))
+    ) {
+      if (!value) return null;
+    }
+    if (this.hasValidator(validator, AppValidators.boolean)) {
+      if (value === '') return null;
+    }
+    return value;
+  }
+
   get(): T {
     var emptyObject = new this.types.itemClass();
     var validator = new this.types.validator();
     var result = Object.assign(emptyObject, this.sourceItem, this.formGroup.value);
     for (let property in result) {
+      if (property.indexOf('.') !== -1) {
+        var splitted = property.split('.');
+        if (Array.isArray(validator[property])) {
+          result[splitted[0]][splitted[1]] = this.getValue(result[property], validator[property]);
+        } else {
+          result[splitted[0]][splitted[1]] = result[property];
+        }
+        delete result[property];
+      }
       if (Array.isArray(validator[property])) {
-        if (
-          (this.hasValidator(validator[property], CustomValidators.date)) ||
-          (this.hasValidator(validator[property], AppValidators.item))
-        ) {
-          if (!result[property]) result[property] = null;
-        }
-        if (this.hasValidator(validator[property], AppValidators.boolean)) {
-          if (result[property] === "") result[property] = null;
-        }
+        result[property] = this.getValue(result[property], validator[property]);
       }
     }
     return result;
@@ -82,16 +96,25 @@ export class Form<T> {
   }
 
   protected setFormGroupValues(item: T, group: FormGroupValidators): any {
+    item = Object.assign({}, item);
     var groupForBuilder = {};
     for (let property in group) {
       // sometimes, constructors are kept
       if ((group[property] instanceof Function)) break;
+      var itemValue = item[property];
+      if (property.indexOf('.') !== -1) {
+        var splitted = property.split('.');
+        itemValue = undefined;
+        if (item[splitted[0]]) {
+          itemValue = item[splitted[0]][splitted[1]];
+        }
+      }
       let value: string = '';
-      if (item[property] !== undefined) {
+      if (itemValue !== undefined) {
         if (this.hasValidator(group[property], CustomValidators.date)) {
-          value = this.formatDate(item[property]);
+          value = this.formatDate(itemValue);
         } else {
-          value = item[property];
+          value = itemValue;
         }
       }
       if (group[property]) {
