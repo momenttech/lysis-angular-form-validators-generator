@@ -58,13 +58,16 @@ export class Form<T> {
     var result = Object.assign(emptyObject, this.sourceItem, this.formGroup.value);
     for (let property in result) {
       if (property.indexOf('.') !== -1) {
-        var splitted = property.split('.');
-        if (Array.isArray(validator[property])) {
-          result[splitted[0]][splitted[1]] = this.getValue(result[property], validator[property]);
-        } else {
-          result[splitted[0]][splitted[1]] = result[property];
+        var splitProp = property.split('.');
+        var fatherProp = splitProp[0];
+        if (result[fatherProp] !== null) {
+          if (Array.isArray(validator[property])) {
+            result[fatherProp][splitProp[1]] = this.getValue(result[property], validator[property]);
+          } else {
+            result[fatherProp][splitProp[1]] = result[property];
+          }
+          delete result[property];
         }
-        delete result[property];
       }
       if (Array.isArray(validator[property])) {
         result[property] = this.getValue(result[property], validator[property]);
@@ -103,11 +106,14 @@ export class Form<T> {
       if ((group[property] instanceof Function)) break;
       var itemValue = item[property];
       if (property.indexOf('.') !== -1) {
-        var splitted = property.split('.');
-        itemValue = undefined;
-        if (item[splitted[0]]) {
-          itemValue = item[splitted[0]][splitted[1]];
+        var splitProp = property.split('.');
+        // a compound property is found BUT it is not a proper embedded object - it might be an intentionnaly set property value, let's keep it
+        // itemValue = undefined;
+        // console.log('property', property, itemValue, item[splitProp[0]]);
+        if (item[splitProp[0]]) {
+          itemValue = item[splitProp[0]][splitProp[1]];
         }
+        //else itemValue = null;
       }
       let value: string = '';
       if (itemValue !== undefined) {
