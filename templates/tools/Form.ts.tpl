@@ -136,7 +136,7 @@ export class Form<T> {
 
   protected formatDate(date: Date): string {
     if (typeof(date) === 'string') date = new Date(date);
-    return (date ? date.toISOString().split('T')[0] : '');
+    return (date ? date.getFullYear() + '-' + (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1) + '-' + (date.getDate() < 10 ? '0' : '') + date.getDate() : '');
   }
 
   protected hasValidator(validatorGroup: Array<any> | any, validator: any): boolean {
